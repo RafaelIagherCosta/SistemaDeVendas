@@ -1,3 +1,4 @@
+import Admin from "@/data/constants/admin";
 import { useState } from "react";
 
 interface TelaLoginProps {
@@ -11,12 +12,11 @@ export default function TelaLogin({ onLogin }: TelaLoginProps) {
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!email || !senha) {
-      alert("Preencha email e senha");
-      return;
+    if (Admin.email === email && Admin.senha === senha) {
+      return onLogin();
+    } else {
+      alert("Email ou senha incorreta");
     }
-
-    onLogin();
   }
 
   return (

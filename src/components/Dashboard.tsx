@@ -8,7 +8,6 @@ export default function Dashboard() {
   const { produtos } = useContext(CatalogoContext);
   const { vendas } = useContext(CarrinhoContext);
 
-  // métricas do sistema
   const totalProdutos = produtos.length;
   const totalVendas = vendas.length;
 
@@ -23,7 +22,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r p-6 flex flex-col justify-between">
         <div>
           <h2 className="font-bold text-black text-xl mb-8">Vendas</h2>
@@ -34,16 +32,13 @@ export default function Dashboard() {
         </button>
       </aside>
 
-      {/* Conteúdo principal */}
       <main className="flex-1 p-8">
-        {/* Header */}
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-black">Dashboard</h1>
 
           <p className="text-gray-500">Visão geral do seu sistema de vendas</p>
         </header>
 
-        {/* Cards de métricas */}
         <section className="grid grid-cols-3 gap-6 mb-8">
           <Card
             title="Total de Produtos"
@@ -70,7 +65,6 @@ export default function Dashboard() {
           />
         </section>
 
-        {/* Ações rápidas */}
         <section className="bg-white p-6 rounded shadow-md flex gap-4">
           <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
             📦 Gerenciar Produtos
@@ -81,7 +75,6 @@ export default function Dashboard() {
           </button>
         </section>
 
-        {/* Tela de gerenciamento de produtos */}
         <TelasProdutos produtosIniciais={produtos} />
       </main>
     </div>

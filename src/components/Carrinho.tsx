@@ -21,7 +21,6 @@ export default function Carrinho() {
   const [valorTotalCupom, setValorTotalCupom] = useState(0);
 
   function finalizarCompra() {
-    // salvamos os dados antes de limpar o carrinho
     setItensDoCupom(itens);
     setValorTotalCupom(total);
 
@@ -32,7 +31,6 @@ export default function Carrinho() {
 
   return (
     <>
-      {/* Overlay */}
       {aberto && (
         <div
           onClick={fecharCarrinho}
@@ -40,13 +38,11 @@ export default function Carrinho() {
         />
       )}
 
-      {/* Sidebar do carrinho */}
       <div
         className={`fixed right-0 top-0 z-50 h-full w-96 bg-white shadow-2xl
         transform transition-transform duration-300
         ${aberto ? "translate-x-0" : "translate-x-full"}`}
       >
-        {/* Header */}
         <div className="flex items-center justify-between border-b p-6">
           <h2 className="text-xl font-bold text-black">🛒 Carrinho</h2>
 
@@ -58,7 +54,6 @@ export default function Carrinho() {
           </button>
         </div>
 
-        {/* Lista de itens */}
         <div className="h-[calc(100%-200px)] space-y-5 overflow-y-auto p-6">
           {itens.length === 0 && (
             <p className="text-center text-gray-600">Seu carrinho está vazio</p>
@@ -86,8 +81,6 @@ export default function Carrinho() {
                     currency: "BRL",
                   })}
                 </p>
-
-                {/* Controle de quantidade */}
                 <div className="mt-2 flex items-center gap-3">
                   <button
                     onClick={() => diminuirQuantidade(item.produto.id)}
@@ -120,7 +113,6 @@ export default function Carrinho() {
           ))}
         </div>
 
-        {/* Footer */}
         <div className="absolute bottom-0 w-full border-t bg-gray-50 p-6">
           <div className="mb-4 flex justify-between text-lg font-bold">
             <span className="text-black">Total</span>
@@ -142,7 +134,6 @@ export default function Carrinho() {
         </div>
       </div>
 
-      {/* Cupom fiscal */}
       {mostrarCupom && (
         <CupomFiscal itens={itensDoCupom} total={valorTotalCupom} />
       )}

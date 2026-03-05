@@ -19,7 +19,6 @@ export default function CupomFiscal({ itens, total }: CupomFiscalProps) {
 
       <hr className="mb-4" />
 
-      {/* Produtos */}
       {itens.map((item) => (
         <div
           key={item.produto.id}
@@ -40,7 +39,6 @@ export default function CupomFiscal({ itens, total }: CupomFiscalProps) {
 
       <hr className="my-4" />
 
-      {/* Total */}
       <div className="flex justify-between font-bold">
         <span className="text-black">Total</span>
 
@@ -52,7 +50,6 @@ export default function CupomFiscal({ itens, total }: CupomFiscalProps) {
         </span>
       </div>
 
-      {/* Botão imprimir */}
       <button
         onClick={() => window.print()}
         className="mt-6 w-full rounded bg-blue-600 py-2 text-white print:hidden"

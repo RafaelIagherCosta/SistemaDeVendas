@@ -14,7 +14,6 @@ export default function Catalogo() {
 
   return (
     <>
-      {/* Botão do carrinho */}
       <div className="mx-auto flex max-w-300 justify-end p-6">
         <button onClick={abrirCarrinho} className="relative text-3xl">
           🛒
@@ -26,7 +25,6 @@ export default function Catalogo() {
         </button>
       </div>
 
-      {/* Lista de produtos */}
       <div className="mx-auto grid max-w-300 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {produtos.map((produto) => (
           <div
