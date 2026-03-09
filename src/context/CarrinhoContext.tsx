@@ -15,7 +15,7 @@ interface CarrinhoContextProps {
   removerProduto: (id: number) => void;
   aumentarQuantidade: (id: number) => void;
   diminuirQuantidade: (id: number) => void;
-
+  excluirItem: (id: number) => void;
   finalizarVenda: () => void;
 }
 
@@ -85,6 +85,11 @@ export function CarrinhoProvider({ children }: CarrinhoProviderProps) {
         .filter((item) => item.quantidade > 0),
     );
   }
+  function excluirItem(id: number) {
+    setItens((listaAtual) =>
+      listaAtual.filter((item) => item.produto.id !== id),
+    );
+  }
 
   const total = itens.reduce(
     (soma, item) => soma + item.produto.preco * item.quantidade,
@@ -112,6 +117,7 @@ export function CarrinhoProvider({ children }: CarrinhoProviderProps) {
         removerProduto,
         aumentarQuantidade,
         diminuirQuantidade,
+        excluirItem,
         finalizarVenda,
       }}
     >

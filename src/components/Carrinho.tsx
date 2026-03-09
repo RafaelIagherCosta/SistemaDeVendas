@@ -1,9 +1,8 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import CarrinhoContext from "@/context/CarrinhoContext";
-import CupomFiscal from "@/components/CupomFiscal";
-import { ItemCarrinho } from "@/data/model/ItemCarrinho";
+import { IconTrash } from "@tabler/icons-react";
 
 export default function Carrinho() {
   const {
@@ -13,21 +12,9 @@ export default function Carrinho() {
     fecharCarrinho,
     aumentarQuantidade,
     diminuirQuantidade,
+    excluirItem,
     finalizarVenda,
   } = useContext(CarrinhoContext);
-
-  const [mostrarCupom, setMostrarCupom] = useState(false);
-  const [itensDoCupom, setItensDoCupom] = useState<ItemCarrinho[]>([]);
-  const [valorTotalCupom, setValorTotalCupom] = useState(0);
-
-  function finalizarCompra() {
-    setItensDoCupom(itens);
-    setValorTotalCupom(total);
-
-    finalizarVenda();
-
-    setMostrarCupom(true);
-  }
 
   return (
     <>
@@ -43,7 +30,7 @@ export default function Carrinho() {
         transform transition-transform duration-300
         ${aberto ? "translate-x-0" : "translate-x-full"}`}
       >
-        <div className="flex items-center justify-between border-b p-6">
+        <header className="flex items-center justify-between border-b p-6">
           <h2 className="text-xl font-bold text-black">🛒 Carrinho</h2>
 
           <button
@@ -52,7 +39,7 @@ export default function Carrinho() {
           >
             ✕
           </button>
-        </div>
+        </header>
 
         <div className="h-[calc(100%-200px)] space-y-5 overflow-y-auto p-6">
           {itens.length === 0 && (
@@ -74,13 +61,13 @@ export default function Carrinho() {
                 <h3 className="font-semibold text-black">
                   {item.produto.nome}
                 </h3>
-
                 <p className="text-sm text-gray-500">
                   {item.produto.preco.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   })}
                 </p>
+
                 <div className="mt-2 flex items-center gap-3">
                   <button
                     onClick={() => diminuirQuantidade(item.produto.id)}
@@ -100,7 +87,13 @@ export default function Carrinho() {
                 </div>
               </div>
 
-              <div className="font-bold text-gray-400">
+              <div className=" flex flex-col justify-between items-start font-bold text-gray-400">
+                <button
+                  onClick={() => excluirItem(item.produto.id)}
+                  className=" rounded bg-red-500 px-3 text-white"
+                >
+                  <IconTrash />
+                </button>
                 {(item.quantidade * item.produto.preco).toLocaleString(
                   "pt-BR",
                   {
@@ -126,17 +119,13 @@ export default function Carrinho() {
           </div>
 
           <button
-            onClick={finalizarCompra}
+            onClick={finalizarVenda}
             className="w-full rounded-xl bg-black py-3 text-white hover:opacity-90"
           >
             Finalizar Compra
           </button>
         </div>
       </div>
-
-      {mostrarCupom && (
-        <CupomFiscal itens={itensDoCupom} total={valorTotalCupom} />
-      )}
     </>
   );
 }
