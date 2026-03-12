@@ -5,13 +5,11 @@
   "debug.console.fontSize": 14,
   "terminal.integrated.fontSize": 14,
   "editor.glyphMargin": false,
-  "workbench.activityBar.location": "hidden",
   "editor.lineNumbers": "off",
   "files.eol": "\n", // Final de linha sempre será LF
   "workbench.editor.labelFormat": "short",
-  "editor.tabSize": 2,
-  "explorer.compactFolders": false,
-
+  "editor.tabSize": 4,
+  "explorer.compactFolders": true,
   // 🛠 Formatação e Lint
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,

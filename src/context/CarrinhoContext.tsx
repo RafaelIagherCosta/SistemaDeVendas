@@ -10,7 +10,6 @@ interface CarrinhoContextProps {
   aberto: boolean;
   abrirCarrinho: () => void;
   fecharCarrinho: () => void;
-
   adicionarProduto: (produto: Produto) => void;
   removerProduto: (id: number) => void;
   aumentarQuantidade: (id: number) => void;

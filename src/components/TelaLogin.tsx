@@ -1,4 +1,3 @@
-import Admin from "@/data/constants/admin";
 import { useState } from "react";
 
 interface TelaLoginProps {
@@ -9,16 +8,34 @@ export default function TelaLogin({ onLogin }: TelaLoginProps) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
 
-    if (Admin.email === email && Admin.senha === senha) {
-      return onLogin();
-    } else {
+    try {
+      const response = await fetch("http://localhost:8000/user/auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: senha,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error();
+      }
+
+      const token = await response.json();
+
+      localStorage.setItem("token", token);
+
+      onLogin();
+    } catch {
       alert("Email ou senha incorreta");
     }
   }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
