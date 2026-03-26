@@ -78,7 +78,7 @@ export default function TelaProdutos() {
     }
 
     async function adicionarProduto() {
-        if (!novoProduto.nome) {
+        if (!novoProduto.preco) {
             alert("Digite o nome do produto");
             return;
         }
@@ -239,7 +239,7 @@ export default function TelaProdutos() {
                                                 className="border border-gray-300 rounded-md px-2 py-1 w-full"
                                             />
                                         ) : (
-                                            `R$ ${produto.preco.toFixed(2)}`
+                                            `R$ ${produto.preco?.toFixed(2)}`
                                         )}
                                     </td>
 
