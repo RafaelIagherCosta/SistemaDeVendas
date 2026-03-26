@@ -23,7 +23,7 @@ export default function TelaProdutos() {
   useEffect(() => {
     const carregarProdutos = async () => {
       try {
-        const data = await listarProdutos();
+        const data = (await listarProdutos()) ?? []; // 🔧 ALTERAÇÃO
         setProdutos(data);
       } catch (erro) {
         console.error(erro);
@@ -45,6 +45,8 @@ export default function TelaProdutos() {
     try {
       const atualizado = await atualizarProduto(produtoEditando);
 
+      if (!atualizado) return; // 🔧 ALTERAÇÃO
+
       setProdutos((prev) =>
         prev.map((p) => (p.id === atualizado.id ? atualizado : p)),
       );
@@ -61,7 +63,10 @@ export default function TelaProdutos() {
     if (!confirmar) return;
 
     try {
-      await deletarProduto(id);
+      const sucesso = await deletarProduto(id); // 🔧 ALTERAÇÃO
+
+      if (!sucesso) return; // 🔧 ALTERAÇÃO
+
       setProdutos((prev) => prev.filter((p) => p.id !== id));
     } catch {
       alert("Erro ao deletar produto");
@@ -76,6 +81,8 @@ export default function TelaProdutos() {
 
     try {
       const criado = await criarProduto(novoProduto);
+
+      if (!criado) return; // 🔧 ALTERAÇÃO
 
       setProdutos((prev) => [...prev, criado]);
 
