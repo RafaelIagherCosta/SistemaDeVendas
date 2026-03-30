@@ -2,113 +2,171 @@ import { Produto } from "@/data/model/Produto";
 
 const API = "http://localhost:8000";
 
-interface ProdutoFrontEnd {
-    nome: string;
-    preco: number;
-    estoque: number;
-}
+/* =========================
+   TIPOS BACKEND
+========================= */
 
 interface ProdutoBackend {
-    name: string;
-    price: number;
-    stock: number;
-    image: null | string;
+  id?: number;
+  name?: string | null;
+  price?: number | null;
+  stock?: number | null;
+  image?: string | null;
 }
+
+/* =========================
+   TIPOS FRONT (INPUT)
+========================= */
+
+interface ProdutoFrontEnd {
+  nome: string;
+  preco: number;
+  estoque: number;
+}
+
+/* =========================
+   HEADERS
+========================= */
 
 function getAuthHeaders(): HeadersInit {
-    const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-    const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-    };
-
-    if (token) {
-        headers.Authorization = `Bearer ${token}`;
-    }
-
-    return headers;
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 }
+
+/* =========================
+   TRATAMENTO
+========================= */
 
 async function tratarResposta<T>(response: Response): Promise<T> {
-    if (!response.ok) {
-        try {
-            const erro = await response.json();
-            console.warn("Erro da API:", erro.detail);
-        } catch {
-            console.warn("Erro na requisição");
-        }
+  if (!response.ok) {
+    let erroMsg = "Erro na requisição";
 
-        throw new Error("Erro na requisição");
-    }
+    try {
+      const erro = await response.json();
+      erroMsg = erro?.detail || erroMsg;
+    } catch {}
 
-    return await response.json();
+    throw new Error(erroMsg);
+  }
+
+  return response.json();
 }
 
-export async function listarProdutos(): Promise<Produto[]> {
-    try {
-        const response = await fetch(`${API}/products`, {
-            headers: getAuthHeaders(),
-        });
+/* =========================
+   NORMALIZAÇÃO SEGURA
+========================= */
 
-        return await tratarResposta<Produto[]>(response);
-    } catch {
-        return []; // 🔧 sempre retorna array
-    }
+function formatarProdutoFront(produto: ProdutoBackend): Produto {
+  return {
+    id: produto.id ?? 0,
+    nome: produto.name ?? "",
+    preco: produto.price ?? 0,
+    estoque: produto.stock ?? 0,
+    imagem: produto.image ?? "",
+    descricao: "",
+  };
 }
 
 function formatarProdutoBackend(produto: ProdutoFrontEnd): ProdutoBackend {
-    return {
+  return {
+    name: produto.nome,
+    price: produto.preco,
+    stock: produto.estoque,
+    image: null,
+  };
+}
+
+/* =========================
+   GET (ROBUSTO)
+========================= */
+
+export async function listarProdutos(): Promise<Produto[]> {
+  try {
+    const response = await fetch(`${API}/products`, {
+      headers: getAuthHeaders(),
+    });
+
+    const data = await tratarResposta<ProdutoBackend[]>(response);
+
+    if (!Array.isArray(data)) return [];
+
+    return data.map(formatarProdutoFront);
+  } catch (error) {
+    console.error("Erro GET produtos:", error);
+    return [];
+  }
+}
+
+/* =========================
+   POST
+========================= */
+
+export async function criarProduto(
+  produto: ProdutoFrontEnd,
+): Promise<Produto | null> {
+  try {
+    const response = await fetch(`${API}/products`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(formatarProdutoBackend(produto)),
+    });
+
+    const data = await tratarResposta<ProdutoBackend>(response);
+
+    return formatarProdutoFront(data);
+  } catch (error) {
+    console.error("Erro POST:", error);
+    return null;
+  }
+}
+
+/* =========================
+   PUT
+========================= */
+
+export async function atualizarProduto(
+  produto: Produto,
+): Promise<Produto | null> {
+  try {
+    const response = await fetch(`${API}/products/${produto.id}`, {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
         name: produto.nome,
         price: produto.preco,
         stock: produto.estoque,
-        image: null,
-    };
+        image: produto.imagem ?? null,
+      }),
+    });
+
+    const data = await tratarResposta<ProdutoBackend>(response);
+
+    return formatarProdutoFront(data);
+  } catch (error) {
+    console.error("Erro PUT:", error);
+    return null;
+  }
 }
 
-export async function criarProduto(
-    produto: ProdutoFrontEnd,
-): Promise<Produto | null> {
-    try {
-        const response = await fetch(`${API}/products`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: JSON.stringify(formatarProdutoBackend(produto)),
-        });
-
-        return await tratarResposta<Produto>(response);
-    } catch {
-        return null;
-    }
-}
-
-export async function atualizarProduto(
-    produto: Produto,
-): Promise<Produto | null> {
-    try {
-        const response = await fetch(`${API}/products/${produto.id}`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: JSON.stringify(produto),
-        });
-
-        return await tratarResposta<Produto>(response);
-    } catch {
-        return null;
-    }
-}
+/* =========================
+   DELETE
+========================= */
 
 export async function deletarProduto(id: number): Promise<boolean> {
-    try {
-        const response = await fetch(`${API}/products/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-        });
+  try {
+    const response = await fetch(`${API}/products/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
 
-        if (!response.ok) return false;
-
-        return true;
-    } catch {
-        return false;
-    }
+    return response.ok;
+  } catch (error) {
+    console.error("Erro DELETE:", error);
+    return false;
+  }
 }

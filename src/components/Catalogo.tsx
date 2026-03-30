@@ -7,10 +7,8 @@ export default function Catalogo() {
   const { adicionarProduto, abrirCarrinho, itens } =
     useContext(CarrinhoContext);
 
-  const quantidadeItens = itens.reduce(
-    (total, item) => total + item.quantidade,
-    0,
-  );
+  const quantidadeItens =
+    itens?.reduce((total, item) => total + item.quantidade, 0) ?? 0;
 
   return (
     <>
@@ -26,7 +24,7 @@ export default function Catalogo() {
       </div>
 
       <div className="mx-auto grid max-w-300 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {produtos.map((produto) => (
+        {produtos?.map((produto) => (
           <div
             key={produto.id}
             className="rounded-xl bg-white px-7 py-10 shadow-2xl"
@@ -38,10 +36,6 @@ export default function Catalogo() {
             />
 
             <h2 className="text-xl font-semibold text-black">{produto.nome}</h2>
-
-            <h3 className="my-2.5 text-md font-medium text-gray-600">
-              {produto.descricao}
-            </h3>
 
             <p className="text-sm text-gray-600">Preço</p>
 

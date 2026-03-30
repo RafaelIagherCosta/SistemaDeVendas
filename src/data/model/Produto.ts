@@ -4,5 +4,5 @@ export interface Produto {
   preco: number;
   estoque: number;
   imagem: string;
-  descricao: string;
+  descricao?: string; // 👈 opcional (evita erro futuro)
 }

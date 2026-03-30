@@ -26,45 +26,78 @@ interface CatalogoProviderProps {
 export function CatalogoProvider({ children }: CatalogoProviderProps) {
   const [produtos, setProdutos] = useState<Produto[]>([]);
 
-  // carregar produtos do backend
+  // =========================
+  // CARREGAR PRODUTOS
+  // =========================
   useEffect(() => {
     async function carregarProdutos() {
       try {
         const data = await listarProdutos();
+
+        if (!Array.isArray(data)) {
+          setProdutos([]);
+          return;
+        }
+
         setProdutos(data);
       } catch (erro) {
         console.error("Erro ao carregar produtos", erro);
+        setProdutos([]);
       }
     }
 
     carregarProdutos();
   }, []);
 
-  // criar produto
+  // =========================
+  // CRIAR PRODUTO
+  // =========================
   async function adicionarProduto(produto: Omit<Produto, "id">) {
-    const criado = await criarProduto(produto);
+    try {
+      const criado = await criarProduto(produto);
 
-    setProdutos((listaAtual) => [...listaAtual, criado]);
+      if (!criado) return;
+
+      // 🔥 garante sync com backend
+      const data = await listarProdutos();
+      setProdutos(Array.isArray(data) ? data : []);
+    } catch (erro) {
+      console.error("Erro ao criar produto", erro);
+    }
   }
 
-  // editar produto
+  // =========================
+  // EDITAR PRODUTO
+  // =========================
   async function editarProduto(produtoAtualizado: Produto) {
-    const atualizado = await atualizarProduto(produtoAtualizado);
+    try {
+      const atualizado = await atualizarProduto(produtoAtualizado);
 
-    setProdutos((listaAtual) =>
-      listaAtual.map((produto) =>
-        produto.id === atualizado.id ? atualizado : produto,
-      ),
-    );
+      if (!atualizado) return;
+
+      // 🔥 garante sync real com backend
+      const data = await listarProdutos();
+      setProdutos(Array.isArray(data) ? data : []);
+    } catch (erro) {
+      console.error("Erro ao editar produto", erro);
+    }
   }
 
-  // deletar produto
+  // =========================
+  // REMOVER PRODUTO
+  // =========================
   async function removerProduto(id: number) {
-    await deletarProduto(id);
+    try {
+      const ok = await deletarProduto(id);
 
-    setProdutos((listaAtual) =>
-      listaAtual.filter((produto) => produto.id !== id),
-    );
+      if (!ok) return;
+
+      // 🔥 garante sync real com backend
+      const data = await listarProdutos();
+      setProdutos(Array.isArray(data) ? data : []);
+    } catch (erro) {
+      console.error("Erro ao remover produto", erro);
+    }
   }
 
   return (
