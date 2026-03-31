@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Carrinho from "@/components/Carrinho";
@@ -14,6 +14,14 @@ import { CatalogoProvider } from "@/context/CatalogoContext";
 export default function Home() {
   const [logado, setLogado] = useState(false);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token") ?? "";
+
+    if (token !== "") {
+      setLogado(true);
+    }
+  }, []);
+
   if (!logado) {
     return <TelaLogin onLogin={() => setLogado(true)} />;
   }
@@ -24,7 +32,7 @@ export default function Home() {
         <CarrinhoProvider>
           <CatalogoProvider>
             <Sidebar />
-            <main className=" flex-1 p-8 ml-64">
+            <main className="flex-1 p-8 ml-64">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/produtos" element={<TelaProdutos />} />

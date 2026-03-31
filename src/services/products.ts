@@ -97,7 +97,13 @@ export async function listarProdutos(): Promise<Produto[]> {
       headers: getAuthHeaders(),
     });
 
-    const data = await tratarResposta<ProdutoBackend[]>(response);
+    let data;
+
+    try {
+      data = await tratarResposta<ProdutoBackend[]>(response)
+    } catch (err) {
+      alert(err)
+    }
 
     if (!Array.isArray(data)) return [];
 
@@ -122,7 +128,7 @@ export async function criarProduto(
       body: JSON.stringify(formatarProdutoBackend(produto)),
     });
 
-    const data = await tratarResposta<ProdutoBackend>(response);
+    let data = await tratarResposta<ProdutoBackend>(response);
 
     return formatarProdutoFront(data);
   } catch (error) {
@@ -157,9 +163,16 @@ export async function atualizarProduto(
       }),
     });
 
-    const data = await tratarResposta<ProdutoBackend>(response);
+    let data;
 
-    return formatarProdutoFront(data);
+    try {
+      data = await tratarResposta<ProdutoBackend>(response);
+      return formatarProdutoFront(data);
+    } catch(err) {
+      alert(err)
+      return null
+    }
+
   } catch (error) {
     console.error("Erro PUT:", error);
     return null;

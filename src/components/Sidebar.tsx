@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BarChart3, Package, ShoppingCart, LogOut } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface ItemProps {
   icone: React.ReactNode;
@@ -16,16 +16,16 @@ function Item({ icone, texto, rota, hover }: ItemProps) {
   return (
     <Link
       to={rota}
-      className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg transition
-      ${
+      className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg transition ${
         ativo
           ? "bg-blue-100 text-blue-700 font-semibold"
           : "text-gray-600 hover:bg-gray-100"
       }`}
     >
       <div
-        className={`transition-all duration-300 flex items-center justify-center
-        ${hover ? "scale-100" : "scale-150"}`}
+        className={`transition-all duration-300 flex items-center justify-center ${
+          hover ? "scale-100" : "scale-150"
+        }`}
       >
         {icone}
       </div>
@@ -37,6 +37,13 @@ function Item({ icone, texto, rota, hover }: ItemProps) {
 
 export default function Sidebar() {
   const [hover, setHover] = useState(false);
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+    window.location.reload();
+  }
 
   return (
     <div
@@ -72,7 +79,10 @@ export default function Sidebar() {
         />
       </div>
 
-      <button className="flex items-center gap-3 border border-red-200 text-red-500 px-4 py-3 rounded-lg hover:bg-red-50 transition">
+      <button
+        className="flex items-center gap-3 border border-red-200 text-red-500 px-4 py-3 rounded-lg hover:bg-red-50 transition"
+        onClick={handleLogout}
+      >
         <div
           className={`transition-all duration-300 ${
             hover ? "scale-150" : "scale-100"
@@ -81,7 +91,7 @@ export default function Sidebar() {
           <LogOut />
         </div>
 
-        {!hover && <span>Sair</span>}
+        {hover && <span>Sair</span>}
       </button>
     </div>
   );

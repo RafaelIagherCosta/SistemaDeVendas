@@ -48,8 +48,10 @@ export default function TelaProdutos() {
 
       setProdutoEmEdicaoId(null);
       setProdutoEditando(null);
-    } catch {
+    } catch (err) {
       alert("Erro ao atualizar produto");
+
+      console.error(err)
     }
   }
 
@@ -154,17 +156,35 @@ export default function TelaProdutos() {
           </div>
 
           {/* 🔥 ADICIONADO SEM ALTERAR DESIGN */}
+
           <div className="flex flex-col gap-1">
             <span className="text-label">Imagem</span>
-            <input type="file" onChange={handleImagem} />
+
+            <label
+              htmlFor="asdhkajdkajsh"
+              className="px-3 py-2 border border-gray-300 rounded-md text-gray-700 cursor-pointer bg-gray-100 hover:bg-gray-200"
+            >
+              Escolha uma imagem
+            </label>
+
+            <input
+              id="asdhkajdkajsh"
+              type="file"
+              onChange={handleImagem}
+              className="hidden"
+            />
+
           </div>
 
-          <button
-            onClick={adicionar}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 rounded-md "
-          >
-            Criar
-          </button>
+          <div className=" flex flex-col justify-end">
+                    <button
+                      onClick={adicionar}
+                      className="bg-green-600 hover:bg-green-700 py-2.5 text-white px-5 rounded-md "
+                    >
+                      Criar
+                    </button>
+
+          </div>
         </div>
       </section>
 

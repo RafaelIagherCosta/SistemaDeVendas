@@ -23,10 +23,6 @@ export default function TelaLogin({ onLogin }: TelaLoginProps) {
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error();
-            }
-
             const token = await response.json();
 
             localStorage.setItem("token", token);
