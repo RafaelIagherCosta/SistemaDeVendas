@@ -1,14 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Produto } from "@/data/model/Produto";
-import {
-  listarProdutos,
-  atualizarProduto,
-  deletarProduto,
-  criarProduto,
-} from "@/services/products";
+import CatalogoContext from "@/context/CatalogoContext";
 
 export default function TelaProdutos() {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const { produtos, adicionarProduto, editarProduto, removerProduto } =
+    useContext(CatalogoContext);
+
   const [produtoEmEdicaoId, setProdutoEmEdicaoId] = useState<number | null>(
     null,
   );
@@ -20,19 +17,23 @@ export default function TelaProdutos() {
     estoque: 0,
   });
 
-  useEffect(() => {
-    const carregarProdutos = async () => {
-      try {
-        const data = (await listarProdutos()) ?? []; // 🔧 ALTERAÇÃO
-        setProdutos(data);
-      } catch (erro) {
-        console.error(erro);
-        alert("Erro ao carregar produtos");
-      }
+  const [imagemBase64, setImagemBase64] = useState<string>("");
+
+  // 🔥 manter só se quiser garantir sync inicial (não quebra nada)
+  useEffect(() => {}, []);
+
+  function handleImagem(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setImagemBase64(reader.result as string);
     };
 
-    carregarProdutos();
-  }, []);
+    reader.readAsDataURL(file);
+  }
 
   function iniciarEdicao(produto: Produto) {
     setProdutoEmEdicaoId(produto.id);
@@ -43,13 +44,7 @@ export default function TelaProdutos() {
     if (!produtoEditando) return;
 
     try {
-      const atualizado = await atualizarProduto(produtoEditando);
-
-      if (!atualizado) return; // 🔧 ALTERAÇÃO
-
-      setProdutos((prev) =>
-        prev.map((p) => (p.id === atualizado.id ? atualizado : p)),
-      );
+      await editarProduto(produtoEditando);
 
       setProdutoEmEdicaoId(null);
       setProdutoEditando(null);
@@ -58,39 +53,36 @@ export default function TelaProdutos() {
     }
   }
 
-  async function removerProduto(id: number) {
+  async function remover(id: number) {
     const confirmar = confirm("Tem certeza que deseja deletar este produto?");
     if (!confirmar) return;
 
     try {
-      const sucesso = await deletarProduto(id); // 🔧 ALTERAÇÃO
-
-      if (!sucesso) return; // 🔧 ALTERAÇÃO
-
-      setProdutos((prev) => prev.filter((p) => p.id !== id));
+      await removerProduto(id);
     } catch {
       alert("Erro ao deletar produto");
     }
   }
 
-  async function adicionarProduto() {
+  async function adicionar() {
     if (!novoProduto.preco) {
       alert("Digite o nome do produto");
       return;
     }
 
     try {
-      const criado = await criarProduto(novoProduto);
-
-      if (!criado) return; // 🔧 ALTERAÇÃO
-
-      setProdutos((prev) => [...prev, criado]);
+      await adicionarProduto({
+        ...novoProduto,
+        imagem: imagemBase64,
+      });
 
       setNovoProduto({
         nome: "",
         preco: 0,
         estoque: 0,
       });
+
+      setImagemBase64("");
     } catch {
       alert("Erro ao criar produto");
     }
@@ -107,6 +99,7 @@ export default function TelaProdutos() {
           Gerencie seu catálogo de produtos
         </p>
       </div>
+
       <section className="flex relative mt-2 border border-slate-300 rounded-lg p-5 pb-8">
         <span className="absolute text-label -top-2 left-3 bg-[#F3F4F6] text-sm  px-2">
           Cadastro
@@ -160,8 +153,14 @@ export default function TelaProdutos() {
             />
           </div>
 
+          {/* 🔥 ADICIONADO SEM ALTERAR DESIGN */}
+          <div className="flex flex-col gap-1">
+            <span className="text-label">Imagem</span>
+            <input type="file" onChange={handleImagem} />
+          </div>
+
           <button
-            onClick={adicionarProduto}
+            onClick={adicionar}
             className="bg-green-600 hover:bg-green-700 text-white px-3 rounded-md "
           >
             Criar
@@ -262,7 +261,7 @@ export default function TelaProdutos() {
                     )}
 
                     <button
-                      onClick={() => removerProduto(produto.id)}
+                      onClick={() => remover(produto.id)}
                       className="bg-red-100 hover:bg-red-200 text-red-600 rounded-md px-3 py-1"
                     >
                       🗑

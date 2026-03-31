@@ -22,6 +22,7 @@ interface ProdutoFrontEnd {
   nome: string;
   preco: number;
   estoque: number;
+  imagem?: string;
 }
 
 /* =========================
@@ -62,8 +63,13 @@ async function tratarResposta<T>(response: Response): Promise<T> {
 ========================= */
 
 function formatarProdutoFront(produto: ProdutoBackend): Produto {
+  // 🔥 NÃO deixa passar produto sem ID
+  if (!produto.id) {
+    throw new Error("Produto veio sem ID do backend");
+  }
+
   return {
-    id: produto.id ?? 0,
+    id: produto.id,
     nome: produto.name ?? "",
     preco: produto.price ?? 0,
     estoque: produto.stock ?? 0,
@@ -77,12 +83,12 @@ function formatarProdutoBackend(produto: ProdutoFrontEnd): ProdutoBackend {
     name: produto.nome,
     price: produto.preco,
     stock: produto.estoque,
-    image: null,
+    image: produto.imagem ?? null,
   };
 }
 
 /* =========================
-   GET (ROBUSTO)
+   GET
 ========================= */
 
 export async function listarProdutos(): Promise<Produto[]> {
@@ -133,6 +139,13 @@ export async function atualizarProduto(
   produto: Produto,
 ): Promise<Produto | null> {
   try {
+    // 🔥 PROTEÇÃO CONTRA ID INVÁLIDO
+    if (!produto.id) {
+      throw new Error("Produto sem ID - não pode atualizar");
+    }
+
+    console.log("Atualizando produto ID:", produto.id);
+
     const response = await fetch(`${API}/products/${produto.id}`, {
       method: "PUT",
       headers: getAuthHeaders(),
@@ -159,6 +172,10 @@ export async function atualizarProduto(
 
 export async function deletarProduto(id: number): Promise<boolean> {
   try {
+    if (!id) {
+      throw new Error("ID inválido para deletar");
+    }
+
     const response = await fetch(`${API}/products/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
